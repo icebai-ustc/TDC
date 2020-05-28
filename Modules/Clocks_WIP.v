@@ -1,66 +1,69 @@
 module DPLL (
-  clk,
-  phase_change_sign,
+  refclk,
+  scanclk,
+  clk0,
+  clk1,
+  clk2,
+  cntsel_in,
+  updn_in,
+  change_phase,
   state
   );
 
 //parameters 
-parameter N_clocks=3;
-
-//inouts
-inout clk;
 
 //input
-input phase_change_sign;
+input refclk; //reference clock
+input scanclk; //scan clock
+input updn_in; //0:neg, 1:pos
+input [5-1:0] cntsel_in;//5'b00001 for 1/8 shift
+input change_phase; //boolean for FSM
 
 //output
-output state;
+output reg [4-1:0] state; //for FSM
+output clk0; //200mhz
+output clk1; //51mhz
+output clk2; //51mhz shifted phase
 
 //local parameters
 localparam up=1'b1, dn=1'b0;
-
-//local regs
-
-//local wires
-
-//dynamic PLL logic
-
-input FPGA_CLK1_50; // The DE0-Nano-SOC's on-board 50 MHz clock pin that I've chosen
-wire clk0; //200MHZ clock; set through PLL megafunction, similar to below
-wire clk1; //51MHz clock
-wire clk2; //51MHZ shifted from clk1 by 78ps increments
-reg phase_en; //must be high at least 2 scanclk cycles
-reg updn=up; //shift phase
-localparam up=1'b1, dn=1'b0;
-reg [5-1:0] cntsel=5'b00001; //reg for using
-//wire [5-1:0] cntsel;//=5'b00000; //increment by 78ps
-wire phase_done;
-
-wire locked; //Lock the fractional PLL to the reference clock before you perform dynamic phase shifts
-reg [4-1:0] last_state;
-wire sign_shift;
-reg stored_sign_shift;
-
-RAM_reset Select_Sign (
-    .clock(clk0),
-    .reset(sign_shift)
-);
-
-always @(posedge clk0) begin
-  if (~sign_shift) stored_sign_shift<=up; //default 0 for positive
-  else stored_sign_shift<=dn;
-end
-
-reg [3-1:0] addr=0; //7 possible phase shifts
-reg node=0;
-reg wren;
-reg [4-1:0] state;
 localparam LOCKING=4'b0000, ASSERT_CNT=4'b0001, ASSERT_EN=4'b0010,
                   CHANGING_PHASE=4'b0100, DONE=4'b1000,
                   WAIT_1=4'b0110, WAIT_2=4'b1100;
+//local regs
+reg phase_en; //must be high at least 2 scanclk cycles
+reg updn;
+reg [5-1:0] cntsel;
+reg [4-1:0] next_state;
+
+//local wires
+wire phase_done; //when changing over 
+wire locked; //Lock the fractional PLL to the reference clock before you perform dynamic phase shifts
+
+//dynamic PLL instance
+PLL_Dynamic PLL (
+  .refclk(refclk),
+	.rst(0),
+  .phase_en(phase_en),
+  .scanclk(scanclk),
+  .updn(updn),
+  .cntsel(cntsel),
+  .phase_done(phase_done),
+	.outclk_0(clk[0]),
+	.outclk_1(clk[1]),
+  .outclk_2(clk[2]),
+  .locked(locked)
+);
+
+//dynamic PLL logic
+
+reg [4-1:0] state;
+localparam LOCKING=4'b0000, ASSERT_CNT=4'b1000, ASSERT_EN=4'b0010,
+                  CHANGING_PHASE=4'b0100, DONE=4'b0001,
+                  WAIT_1=4'b0110, WAIT_2=4'b1100;
 
 //FSM for changing phase
-always @(posedge clk1) begin
+always @(posedge scanclk) begin
   if (change_phase) begin
     state<=LOCKING;
   end
@@ -81,8 +84,8 @@ always @(posedge clk1) begin
         end
       end
       ASSERT_CNT: begin
-        cntsel<=5'b00001;
-        updn<=stored_sign_shift;
+        cntsel<=cntsel_in;
+        updn<=updn_in;
         next_state<=ASSERT_EN;
         state<=WAIT_1;
       end
@@ -104,6 +107,9 @@ always @(posedge clk1) begin
       end
       DONE: begin
         state<=DONE;
+        next_state<=DONE;
       end
     endcase
 end
+
+endmodule
