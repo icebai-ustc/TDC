@@ -1,0 +1,5 @@
+Will post useful links here.
+May delete.
+
+For primitives/LUT masks:
+https://forums.intel.com/s/question/0D50P00003yyPcjSAE/designing-with-low-level-primitives?language=en_US
