@@ -1,3 +1,204 @@
+module TDC_using_DPLL_WIP(
+  FPGA_CLK1_50
+  );
+
+//dynamic PLL logic
+
+input FPGA_CLK1_50; // A DE0-Nano-SOC's on-board 50 MHz clock
+wire clk0; //200MHZ clock
+wire clk1; //51MHz clock
+wire clk2; //51MHZ shifted from clk1 by 78ps increments
+reg phase_en; //must be high at least 2 scanclk cycles
+reg updn=up; //shift phase
+localparam up=1'b1, dn=1'b0;
+reg [5-1:0] cntsel=5'b00001; //reg for using
+//wire [5-1:0] cntsel;//=5'b00000; //increment by 78ps
+wire phase_done;
+wire locked; //Lock the fractional PLL to the reference clock before you perform dynamic phase shifts
+reg [4-1:0] last_state;
+wire sign_shift;
+reg stored_sign_shift;
+RAM_reset Select_Sign (
+    .clock(clk0),
+    .reset(sign_shift)
+);
+always @(posedge clk0) begin
+  if (~sign_shift) stored_sign_shift<=up; //default 0 for positive
+  else stored_sign_shift<=dn;
+end
+reg [3-1:0] addr=0; //7 possible phase shifts
+reg node=1;
+reg wren;
+//FSM for changing phase
+always @(posedge clk1) begin
+  if (change_phase) begin
+    state<=LOCKING;
+  end
+  else
+    case(state)
+      WAIT_1: begin
+        state<=WAIT_2;
+      end
+      WAIT_2: begin
+        state<=next_state;
+      end
+      LOCKING: begin
+        if (locked) begin
+          state<=ASSERT_CNT; //if PLL has locked, set cntsel high
+        end
+        else begin
+          state<=LOCKING; //else wait
+        end
+      end
+      ASSERT_CNT: begin
+        cntsel<=5'b00001;
+        updn<=stored_sign_shift;
+        next_state<=ASSERT_EN;
+        state<=WAIT_1;
+      end
+      ASSERT_EN: begin
+        phase_en<=1;
+        next_state<=CHANGING_PHASE;
+        state<=WAIT_1;
+      end
+      CHANGING_PHASE: begin
+        if (!phase_done) begin
+          phase_en<=0;
+          state<=DONE;
+        end
+        else begin
+          state<=CHANGING_PHASE;
+          //state<=WAIT_1; //being safe; could state<=CHANGING_PHASE
+          //next_state<=CHANGING_PHASE;
+        end
+      end
+      DONE: begin
+        state<=DONE;
+      end
+    endcase
+end
+
+/*always @(negedge clk2 or posedge clk1) begin
+  if (next_exp==MEASURE & ~sign_shift) begin
+    wren<=1;
+  end
+  if (exp==MEASURE & sign_shift)
+end*/
+//always @(clk2) begin
+
+//end
+
+reg change_phase;
+//control logic for experiment
+//let's increment phase shift and measure over time
+always @(posedge clk1) begin
+  case(exp)
+    RESET_PHASE: begin
+      //wren<=0;
+      if (addr==3'b111) begin
+        exp<=EXP_DONE;
+      end
+      else begin
+        change_phase<=1;
+        exp<=WAIT_PHASE;
+        addr<=addr+1;
+      end
+    end
+    WAIT_PHASE: begin
+      change_phase<=0;
+      if (state==DONE) begin
+        node<=1;
+        exp<=MEASURE;
+      end
+      else begin
+        exp<=WAIT_PHASE;
+      end
+    end
+    MEASURE: begin
+      node<=0;
+      exp<=RESET_PHASE;
+    end
+  endcase
+end
+
+//always @(negedge clk2) begin
+  //if (exp==MEASURE) wren<=1;
+  //else wren<=0;
+//end
+
+//dynamics for experiment
+//always @(posedge clk1) begin
+  //if (exp!=EXP_DONE & last_state==CHANGING_PHASE) begin
+    //node<=0;
+  //end
+  //else node<=0;
+//end
+
+PLL_Dynamic PLL (
+  .refclk(FPGA_CLK1_50),
+	.rst(0),
+  .phase_en(phase_en),
+  .scanclk(FPGA_CLK1_50),
+  .updn(updn),
+  .cntsel(cntsel),
+  .phase_done(phase_done),
+	.outclk_0(clk0),
+	.outclk_1(clk1),
+  .outclk_2(clk2),
+  .locked(locked)
+);
+
+
+reg [4-1:0] state;
+localparam LOCKING=4'b0000, ASSERT_CNT=4'b0001, ASSERT_EN=4'b0010,
+                  CHANGING_PHASE=4'b0100, DONE=4'b1000,
+                  WAIT_1=4'b0110, WAIT_2=4'b1100;
+reg [3-1:0] exp;
+localparam RESET_PHASE=3'b001, WAIT_PHASE=3'b010, MEASURE=3'b100, EXP_DONE=3'b000;
+
+//carrychain logic
+localparam N=16;
+reg [N-1:0] a=16'h0000;
+reg [N-1:0] b=16'hFFFF;
+wire [N-1:0] s; //sum out
+
+//instance calls
+//TDC instance
+wire node_wire;
+assign node_wire=node;
+CarryChain #(N) MyCarry (
+    .a(a),
+    .b(b),
+    .cin(node_wire),
+    .sout(s),
+    .clk(clk2)
+);
+//memory for checking node increments
+RAM_response #(
+  .N_RESPONSE_BITS_PER_WORD(1),
+  .N_RESPONSE_WORDS(8),
+  .hint("ENABLE_RUNTIME_MOD=YES,INSTANCE_NAME=Node")
+  ) R (
+  .clock(clk1),
+  .response(node),
+  .resp_addr(addr),
+  .write(wren)
+);
+//memory for storing TDC
+RAM_response #(
+  .N_RESPONSE_BITS_PER_WORD(N),
+  .N_RESPONSE_WORDS(8),
+  .hint("ENABLE_RUNTIME_MOD=YES,INSTANCE_NAME=TDC")
+  ) RR (
+  .clock(clk1),
+  .response(s),
+  .resp_addr(addr),
+  .write(wren)
+);
+
+endmodule
+
+
 module TDC_using_DPLL(
   FPGA_CLK1_50
   );
