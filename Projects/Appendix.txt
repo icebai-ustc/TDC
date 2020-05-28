@@ -1,0 +1,3 @@
+Here I will list different quartus projects using the convenient Quartus archiving function, 
+which allow for an entire Quartus project I compile and run
+to be loaded, compiled, and run on your computer.
