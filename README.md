@@ -2,13 +2,13 @@
 Time to digital converter implemented on a Cyclone V (DE10-Nano) FPGA.
 
 # Contents
-Modules folder holds Verilog modules. Not all are used for the TDC.
+Modules folder holds Verilog modules, including Carry Chains, Dynamic PLLs, and Memory.
 
 Projects folder holds Quartus archived project files.
 
-Python folder holds Python scripts for file manipulation, etc.
+Python folder holds Python scripts for automating logic placement and memory read/write.
 
-References folder holds content used in creating the TDC.
+References folder holds sources used in creating TDC.
 
 # To-Do
 MODULES:
