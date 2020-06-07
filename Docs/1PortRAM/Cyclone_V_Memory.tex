@@ -116,7 +116,7 @@ reg q_sig[7:0];
 assign clk_sig = clk;
 \end{minted}
 
-Where clk is the input clock to your main module, and \textless name\textgreater is the name given to the RAM module. To write a value to memory, first the wren\_sig wire must be set high (you could assign a register to it), then the desired values need to be put into the address\_sig and data\_sig registers. 
+Where clk is the input clock to your main module, and \textless name\textgreater is the name given to the RAM module. To write a value to memory, first the wren\_sig wire must be set high (you could assign a register to it), then the desired values need to be put into the address\_sig and data\_sig registers. For an example of a complete verilog file see Appendix B.
 
 %Some thought needs to be given to the TODO: Document undefined behavior in single clock cycles.
 
@@ -154,6 +154,12 @@ Code for the QuartusMemory class. Also available at \\ https://github.com/Noeloi
 \inputminted[linenos=true,breaklines,breakanywhere=true]{python}{../../Python/QuartusMemory.py}
 \end{mdframed}
 
+\section{Verilog Example}
+An example of a 1-Port RAM module being filled with the output of a counter.
+
+\begin{mdframed}
+\inputminted[linenos=true,breaklines,breakanywhere=true]{verilog}{memExample.v}
+\end{mdframed}
 
 \end{document}
 
