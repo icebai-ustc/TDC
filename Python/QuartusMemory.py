@@ -23,7 +23,7 @@ class QuartusMemory():
 
     #Below finds instance index given a name (string)
 
-        def find_instance(self,inst_name,N_levels=2):
+    def find_instance(self,inst_name,N_levels=2):
         
         self.memories_raw = self.quartus.get_editable_mem_instances(hardware_name=self.hwname,\
             device_name=self.devname)
