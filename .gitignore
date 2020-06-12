@@ -2,3 +2,4 @@
 *.log
 _minted*
 ROdata.pdf
+__pycache__
