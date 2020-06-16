@@ -24,7 +24,7 @@ for i in data:
         has_data.append(False)
     else:
         has_data.append(True)
-    print(num)
+    #print(num)
     num = 0
 
 # Takes addresses with data and get int value
@@ -36,6 +36,10 @@ for i in range(len(data)):
         #print(strng)
         strng = ''
 
+for i in range(len(data_num)):
+    if data_num[i] > 700:
+        print(i)
+
 # Generate Histogram
 az = plt.subplot()
 
@@ -44,13 +48,13 @@ plottingdata = data_num
 stdevn = st.stdev(plottingdata)
 meann = np.mean(plottingdata)
 
-print(len(data_num))
+#print(len(data_num))
 
 n, bins, patches = plt.hist(plottingdata, num_bins, facecolor='blue', alpha=0.5)
 textbox = '\n'.join(('$\mu=%.7f$' % (meann, ),'$\sigma=%.7f$' % (stdevn, ),'$\sigma/\mu=%.7f$' % (stdevn/meann, )))
 props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
 az.text(0.15, 0.95, textbox, transform=az.transAxes, fontsize=14, verticalalignment='top', bbox=props)
-plt.title(r'Frequency of 54 N=19 Ring Oscillators')
+plt.title(r'Frequency of ' + str(len(data_num)) + r' N=19 Ring Oscillators')
 plt.ylabel('Number of values in bin') 
 plt.xlabel(r'Frequency in MHz')
 # plt.ylim(0,240)

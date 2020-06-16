@@ -44,7 +44,7 @@ If you do not already have the IP Catalog open in Quartus, you can get to it by 
   \caption{}
 \end{figure}
 
-With the megafunction wizard open, you can specify the size in bits stored at each memory address by setting the width of the output bus ``q``. Setting how many words of memory specifies how many addresses we have to use, so total memory capacity will be number of words times how many bits per word. Leaving the rest to ``Auto`` and ``Single clock`` are fine, unless you know you need otherwise.
+With the megafunction wizard open, you can specify the size in bits stored at each memory address by setting the width of the output bus ``q''. Setting how many words of memory specifies how many addresses we have to use, so total memory capacity will be number of words times how many bits per word. Leaving the rest to ``Auto'' and ``Single clock'' are fine, unless you know you need otherwise.
 
 \begin{figure}[H]
   \centering
@@ -64,7 +64,7 @@ For pages 2 and 3 options can be left at default for a simple implementation. Th
   \caption{MegaWizard page 3}
 \end{figure}
 
-On page 4 here you'll want to check the box for ``Allow In-System Memory Content Editor ...`` so that the memory is accessable by external means. Here you can also specify initial contents of the memory. A .mif file can be generated using the mif python package.
+On page 4 here you'll want to check the box for ``Allow In-System Memory Content Editor ...'' so that the memory is accessable by external means. Here you can also specify initial contents of the memory. A .mif file can be generated using the mif python package.
 
 \begin{figure}[H]
   \centering
@@ -130,11 +130,11 @@ The simplest way to read and write to the memory on the FPGA is to use Quartus's
   \caption{In-System Memory Content Editor}
 \end{figure}
 
-In the upper right section of the window, we have the basic functionality of the device programmer. Clicking the button directly to the right of ``File:`` will program the FPGA with the specified .sof file. The top left section lists the memory instances Quartus has found on the board. Right clicking an instance provides different options to read and write to the memory. The bottom section contains the memory currently selected in hex values on the left, and ASCII decoded on the right.
+In the upper right section of the window, we have the basic functionality of the device programmer. Clicking the button directly to the right of ``File:'' will program the FPGA with the specified .sof file. The top left section lists the memory instances Quartus has found on the board. Right clicking an instance provides different options to read and write to the memory. The bottom section contains the memory currently selected in hex values on the left, and ASCII decoded on the right.
 
 \subsection{Using the mif and quartustcl Python Packages}
 
-In order to interface with the memory using these packages we will be using the QuartusMemory class. Code for the class is provided in Appendix A. Here is some example code using the class:
+In order to interface with the memory using these packages we will be using the QuartusMemory class. In order to use the quartustcl package that QuartusMemory is based on in Windows, you must add the quartus scripts to your enviroment path variable. Code for the class is provided in Appendix A. Here is some example code using the class:
 
 \begin{mdframed}
 \inputminted[linenos=true,breaklines,breakanywhere=true]{python}{../../Python/memoryExample.py}
