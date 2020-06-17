@@ -92,7 +92,7 @@ After clicking finish, Quartus will prompt you to add the IP to your project.
 \section{Using the Memory}
 \subsection{Instantiating the module and writing to it}
 
-The memory can be instantiated with the following verilog. Somthing important to note, instantiating multiple times from the same IP will create multiple RAM instances with different indicies but the same instance ID name (See the columns in the In-System Memory content editor). This is important to keep in mind when using the python interface as the find\_instance function will only find one of them.
+The memory can be instantiated with the following verilog. Something important to note, instantiating multiple times from the same IP will create multiple RAM instances with different indices but the same instance ID name (See the columns in the In-System Memory content editor). This is important to keep in mind when using the python interface as the find\_instance function will only find one of them.
 
 \begin{minted}[linenos=true]{verilog}
 <name> ram_inst (
@@ -104,7 +104,7 @@ The memory can be instantiated with the following verilog. Somthing important to
 );
 \end{minted}
 
-You need to define the inputs and outputs earlier in the code with the names in the parentheses. Also replace \textless name\textgreater\ with the name that you assigned the IP module. The register sizes must match the values specified when the module was created. For example the delcarations for a RAM module with 8-bit words and a 8-bit address space would be:
+You need to define the inputs and outputs earlier in the code with the names in the parentheses. Also replace \textless name\textgreater\ with the name that you assigned the IP module. The register sizes must match the values specified when the module was created. For example the declarations for a RAM module with 8-bit words and a 8-bit address space would be:
 
 \begin{minted}[linenos=true]{verilog}
 reg address_sig[7:0];
@@ -134,14 +134,21 @@ In the upper right section of the window, we have the basic functionality of the
 
 \subsection{Using the mif and quartustcl Python Packages}
 
-In order to interface with the memory using these packages we will be using the QuartusMemory class. In order to use the quartustcl package that QuartusMemory is based on in Windows, you must add the quartus scripts to your enviroment path variable. Code for the class is provided in Appendix A. Here is some example code using the class:
+In order to interface with the memory using these packages we will be using the QuartusMemory class. In order to use the quartustcl package that QuartusMemory is based on in Windows, you must add the quartus scripts to your environment path variable. This can be done by first locating the quartus install directory, typically at C:\textbackslash IntelFPGA\_lite\textbackslash\textless version\textgreater\textbackslash quartus\textbackslash bin64. This needs to be added to the PATH environment variable. This can be done by windows searching for ``Environment Variables'' and editing the path variable as shown below.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{pics/EnvironmentVariables.png}
+  \caption{Editing the PATH environment variable}
+\end{figure}
+
+With this done, quartus scripts can now be used via command line and the python package quartustcl will function. Code for the QuartusMemory class is provided in Appendix A. Below is an example program using the class.
 
 \begin{mdframed}
 \inputminted[linenos=true,breaklines,breakanywhere=true]{python}{../../Python/memoryExample.py}
 \end{mdframed}
 
-The code here simply reads the memory from the device into an array, changes a bit in it, writes it back to the device, then lastly reads to confirm the write executed correctly. The boolean argument at the end of each function call is whether to delete the .mif file generated. Both read and write default to not delete it. It is worth noting that running this script multiple times will overwrite and delete previously generated .mif files. If saving them is desired they should be renamed. The array format is of a two dimesional numpy array with type uint8 (unsigned 8-bit integer). 
-This code can be found at https://github.com/Noeloikeau/TDC/tree/Liam in the Python folder.
+The code here simply reads the memory from the device into an array, changes a bit in it, writes it back to the device, then lastly reads to confirm the write executed correctly. The boolean argument at the end of each function call is whether to delete the .mif file generated. Both read and write default to not delete it. It is worth noting that running this script multiple times will overwrite and delete previously generated .mif files. If saving them is desired they should be renamed. The array format is of a two dimensional numpy array consisting of 1's and 0's with type uint8 (unsigned 8-bit integer). This code can be found at https://github.com/Noeloikeau/TDC/tree/Liam in the Python folder.
 
 \newpage
 \appendix
