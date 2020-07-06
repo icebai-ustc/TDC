@@ -22,8 +22,10 @@ linenos]
 
 \maketitle
 
+This document will go over setting up and using a 1-Port RAM module on a CylcloneV FPGA. Reading the memory is shown with two methods, both of which utilized the JTAG interface with different frontends.
+
 \section{Adding the RAM to Your Project}
-There are two ways you can add the RAM to your Quartus project, either with the IP Catalog or by writing it in by hand.
+The primary way to add a 1-Port RAM module to your project is to use the IP Megafunction Wizard.
 
 \subsection{Using the IP Catalog}
 
@@ -134,7 +136,7 @@ In the upper right section of the window, we have the basic functionality of the
 
 \subsection{Using the mif and quartustcl Python Packages}
 
-In order to interface with the memory using these packages we will be using the QuartusMemory class. In order to use the quartustcl package that QuartusMemory is based on in Windows, you must add the quartus scripts to your environment path variable. This can be done by first locating the quartus install directory, typically at C:\textbackslash IntelFPGA\_lite\textbackslash\textless version\textgreater\textbackslash quartus\textbackslash bin64. This needs to be added to the PATH environment variable. This can be done by windows searching for ``Environment Variables'' and editing the path variable as shown below.
+In order to interface with the memory using these packages we will be using the QuartusMemory class. In order to use the quartustcl package that QuartusMemory is based on in Windows, you must add the quartus scripts to your environment path variable. This can be done by first locating the quartus install directory, typically at C:\textbackslash IntelFPGA\_lite\textbackslash\textless version\textgreater\textbackslash quartus\textbackslash bin64. This needs to be added to the Path environment variable. This can be done by windows searching for ``Environment Variables'' and editing the path variable as shown below.
 
 \begin{figure}[H]
   \centering
