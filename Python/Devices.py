@@ -1,7 +1,3 @@
-#File indexing type of logic at each location on a DE-10 Nano FPGA grid.
-
-import numpy as np
-
 _5CSEBA6U23I7 = {} #indexed by location, having type of logic and associated instance
 x = _5CSEBA6U23I7 #shorthand
 X,Y,Z=(90,82,60)
@@ -36,7 +32,11 @@ NONEs.extend([(i,j) for i,j in np.ndindex(X,Y) if i in NONE_Xs and j in NONE_Ys]
 for i,j in np.ndindex(X,Y): #thread over given values
     v=(i,j)
     x[v]={}
-    if v in MLABs:
+       
+    if v in NONEs:
+        x[v].update({"TYPE":"NONE"})
+		
+    elif v in MLABs:
         x[v].update({"TYPE":"MLAB"})
         x[v].update({k:{} for k in range(Z)})
         for l in range(Z):
@@ -48,9 +48,6 @@ for i,j in np.ndindex(X,Y): #thread over given values
     elif v in RAMs:
         x[v].update({"TYPE":"RAM"})
 
-    elif v in NONEs:
-        x[v].update({"TYPE":"NONE"})
-
     else: #LABs
         x[v].update({"TYPE":"LAB"})
         x[v].update({k:{} for k in range(Z)})
@@ -60,4 +57,4 @@ for i,j in np.ndindex(X,Y): #thread over given values
             else:
                 x[v][l]["TYPE"]="FF"
 
-_5CSEBA6U23I7=x #restore label
+rsrc_type =x #restore label
